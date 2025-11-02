@@ -99,9 +99,36 @@ export default function DashboardPage() {
   }
 
   const startPolling = (senderId: string) => {
-    // Polling is handled by n8n callback to /api/n8n/webhook
-    // This function is kept for future polling implementation if needed
-    console.log('Sender check started for:', senderId)
+    // Poll for status updates every 2 seconds
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/n8n/status/${senderId}`)
+        if (!response.ok) {
+          // Status not found yet, keep polling
+          return
+        }
+
+        const data = await response.json()
+        
+        if (data.status === 'completed' || data.status === 'error') {
+          clearInterval(pollInterval)
+          setStatus({
+            senderId,
+            status: data.status,
+            message: data.message || 'Prüfung abgeschlossen',
+            timestamp: new Date().toISOString(),
+            details: data.details || {},
+          })
+        }
+      } catch (error) {
+        console.error('Polling error:', error)
+      }
+    }, 2000)
+
+    // Cleanup after 60 seconds
+    setTimeout(() => {
+      clearInterval(pollInterval)
+    }, 60000)
   }
 
   const handleReset = () => {
