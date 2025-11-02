@@ -22,7 +22,7 @@ export interface StatusData {
   frame_variance_pct?: number
   connect_ms?: number
   test_duration_s?: number
-  [key: string]: any
+  [key: string]: unknown
 }
 
 class StatusStore {
