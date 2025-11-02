@@ -110,10 +110,17 @@ export default function StatusDisplay({ status, onReset }: StatusDisplayProps) {
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Details
             </h3>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-              <pre className="text-xs text-gray-600 dark:text-gray-400 overflow-x-auto">
-                {JSON.stringify(status.details, null, 2)}
-              </pre>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
+              {Object.entries(status.details).map(([key, value]) => (
+                <div key={key} className="flex flex-col">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    {key.replace(/_/g, ' ')}
+                  </span>
+                  <span className="text-sm text-gray-800 dark:text-gray-200 mt-1">
+                    {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
