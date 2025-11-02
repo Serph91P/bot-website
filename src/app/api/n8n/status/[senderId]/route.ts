@@ -7,16 +7,20 @@ export async function GET(
 ) {
   try {
     const { senderId } = await params
+    console.log(`[Status API] Checking status for sender ${senderId}`)
 
     // Check if we have a status update for this sender
     const status = statusStore.get(senderId)
 
     if (!status) {
+      console.log(`[Status API] No status found for sender ${senderId}`)
       return NextResponse.json(
         { error: 'Status not found' },
         { status: 404 }
       )
     }
+
+    console.log(`[Status API] Found status for sender ${senderId}:`, status.status)
 
     // Format the response based on what n8n sends
     const isError = status.status === 'offline' || status.status === 'error' || status.live === false
