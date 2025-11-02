@@ -108,19 +108,47 @@ export default function StatusDisplay({ status, onReset }: StatusDisplayProps) {
         {status.details && Object.keys(status.details).length > 0 && (
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Details
+              Technische Details
             </h3>
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
-              {Object.entries(status.details).map(([key, value]) => (
-                <div key={key} className="flex flex-col">
-                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                    {key.replace(/_/g, ' ')}
-                  </span>
-                  <span className="text-sm text-gray-800 dark:text-gray-200 mt-1">
-                    {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
-                  </span>
-                </div>
-              ))}
+              {Object.entries(status.details).map(([key, value]) => {
+                // Format the key nicely
+                const formattedKey = key
+                  .replace(/_/g, ' ')
+                  .replace(/\b\w/g, (l) => l.toUpperCase())
+
+                // Format the value based on type
+                let formattedValue = String(value)
+                
+                if (key === 'latency' || key.includes('latency')) {
+                  formattedValue = `${value} ms`
+                } else if (key === 'test_duration') {
+                  formattedValue = `${value} Sekunden`
+                } else if (key === 'stable' || key === 'live') {
+                  formattedValue = value ? '✅ Ja' : '❌ Nein'
+                } else if (key === 'quality') {
+                  const qualityMap: Record<string, string> = {
+                    excellent: '🟢 Ausgezeichnet',
+                    good: '🟡 Gut',
+                    poor: '🟠 Schlecht',
+                    offline: '🔴 Offline'
+                  }
+                  formattedValue = qualityMap[String(value)] || String(value)
+                } else if (key === 'failed_checks') {
+                  formattedValue = value === 0 ? '✅ Keine' : `❌ ${value}`
+                }
+
+                return (
+                  <div key={key} className="flex justify-between items-center">
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                      {formattedKey}:
+                    </span>
+                    <span className="text-sm text-gray-800 dark:text-gray-200 font-medium">
+                      {typeof value === 'object' ? JSON.stringify(value, null, 2) : formattedValue}
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
