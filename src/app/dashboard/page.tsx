@@ -99,24 +99,9 @@ export default function DashboardPage() {
   }
 
   const startPolling = (senderId: string) => {
-    // In a production app, implement proper polling or use WebSockets/SSE
-    // This is a simplified example
-    const pollInterval = setInterval(() => {
-      // Check for updates from the backend
-      // For now, we'll just simulate a completion after 5 seconds
-      setTimeout(() => {
-        clearInterval(pollInterval)
-        setStatus({
-          senderId,
-          status: 'completed',
-          message: 'Die Sender-Prüfung wurde erfolgreich abgeschlossen.',
-          timestamp: new Date().toISOString(),
-          details: {
-            note: 'Dies ist eine Beispiel-Antwort. In der Produktion würden hier echte Daten von n8n ankommen.',
-          },
-        })
-      }, 5000)
-    }, 1000)
+    // Polling is handled by n8n callback to /api/n8n/webhook
+    // This function is kept for future polling implementation if needed
+    console.log('Sender check started for:', senderId)
   }
 
   const handleReset = () => {
