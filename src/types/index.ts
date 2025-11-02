@@ -54,9 +54,27 @@ export interface N8nWebhookPayload {
 }
 
 export interface N8nCallbackPayload {
-  senderId: string
-  status: 'completed' | 'error'
-  message: string
+  senderId?: string
+  stream_id?: number
+  user_id?: string
+  status?: 'completed' | 'error'
+  message?: string
+  live?: boolean
+  stable?: boolean
+  quality?: string
+  avg_latency_ms?: number
+  output?: string
+  checks?: number
+  failed_checks?: number
+  stream_type?: string
+  total_frames?: number
+  avg_frames?: number
+  min_frames?: number
+  max_frames?: number
+  frame_variance?: number
+  frame_variance_pct?: number
+  connect_ms?: number
+  test_duration_s?: number
   details?: Record<string, unknown>
 }
 
