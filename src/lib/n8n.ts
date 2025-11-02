@@ -6,7 +6,7 @@ import {
 } from '@/types'
 
 class N8nClient {
-  private client: AxiosInstance
+  private webhookUrl: string
 
   constructor() {
     const webhookUrl = process.env.N8N_WEBHOOK_URL
@@ -14,13 +14,7 @@ class N8nClient {
       throw new Error('N8N_WEBHOOK_URL is not configured')
     }
 
-    this.client = axios.create({
-      baseURL: webhookUrl,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: 30000, // 30 seconds
-    })
+    this.webhookUrl = webhookUrl
   }
 
   /**
@@ -36,9 +30,15 @@ class N8nClient {
         userId,
       }
 
-      const response = await this.client.post<SenderCheckResponse>(
-        '/sender-search',
-        payload
+      const response = await axios.post<SenderCheckResponse>(
+        this.webhookUrl,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 30000,
+        }
       )
 
       return response.data
@@ -59,11 +59,19 @@ class N8nClient {
     userId: string
   ): Promise<SenderCheckResponse> {
     try {
-      const response = await this.client.post<SenderCheckResponse>(
-        '/sender-confirm',
+      // For sender selection, we use the same webhook URL
+      // The n8n workflow will handle both actions based on the payload
+      const response = await axios.post<SenderCheckResponse>(
+        this.webhookUrl,
         {
           senderId,
           userId,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 30000,
         }
       )
 
