@@ -459,14 +459,14 @@ graph TD
     D --> F[DB Search by ID]
     
     E --> G[Match Channel Logic]
-    F --> H[Get Stream URL]
+    F --> G
     
-    G --> I{Found?}
-    I -->|Single Match| J[Respond: Start Check]
-    I -->|Multiple| K[Respond: Sender List]
-    I -->|None| L[Respond: Not Found]
+    G --> I{Needs Selection?}
+    I -->|Yes Multiple| K[Respond: Sender List]
+    I -->|No Single Match| J[Respond: Start Check]
+    I -->|No Match| L[Respond: Not Found]
     
-    H --> M[HTTP Test]
+    J --> M[HTTP Test]
     M --> N{Online?}
     N -->|Yes| O[SSH Stability Test]
     N -->|No| P[Send: Offline Status]
