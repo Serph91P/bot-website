@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { N8nCallbackPayload } from '@/types'
+import { statusStore } from '@/lib/status-store'
 
 /**
  * Webhook endpoint for n8n to send status updates back to the application
@@ -7,21 +7,15 @@ import { N8nCallbackPayload } from '@/types'
  */
 export async function POST(req: NextRequest) {
   try {
-    // const signature = req.headers.get('x-n8n-signature')
-    const body: N8nCallbackPayload = await req.json()
+    const body = await req.json()
 
-    // Validate signature (optional but recommended)
-    // if (!N8nClient.validateCallback(body, signature || '')) {
-    //   return NextResponse.json({ error: 'Invalid signature' }, { status: 403 })
-    // }
-
-    // In a production app, you would store this in a database or use Server-Sent Events
-    // to push the update to the client in real-time
-    // For now, we just log it
     console.log('Received n8n callback:', body)
 
-    // You could store the status update in a database here
-    // or use a real-time mechanism like WebSockets or SSE to notify the client
+    // Store the status update in memory
+    if (body.stream_id) {
+      const senderId = String(body.stream_id)
+      statusStore.set(senderId, body)
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
