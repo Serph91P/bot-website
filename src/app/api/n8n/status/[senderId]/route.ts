@@ -18,11 +18,14 @@ export async function GET(
       )
     }
 
-    // Format the response
+    // Format the response based on what n8n sends
+    const isError = status.status === 'offline' || status.status === 'error' || status.live === false
+    const isCompleted = status.status === 'online' || status.status === 'completed' || status.live === true
+
     const response = {
-      status: status.live === false ? 'error' : 'completed',
-      message: status.output || (status.live ? '✅ Sender ist online' : '❌ Sender ist offline'),
-      details: {
+      status: isError ? 'error' : isCompleted ? 'completed' : 'checking',
+      message: status.message || status.output || (isError ? '❌ Sender ist offline' : '✅ Sender ist online'),
+      details: status.details || {
         live: status.live,
         stable: status.stable,
         quality: status.quality,
