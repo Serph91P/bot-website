@@ -16,7 +16,7 @@ services:
       
       # n8n Configuration
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
-      - N8N_CALLBACK_SECRET=${N8N_CALLBACK_SECRET}
+      - N8N_WEBHOOK_SECRET=${N8N_WEBHOOK_SECRET}
       
       # NextAuth Configuration
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
