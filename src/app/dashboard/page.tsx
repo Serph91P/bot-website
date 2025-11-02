@@ -79,16 +79,20 @@ export default function DashboardPage() {
         throw new Error(data.error || 'Fehler bei der Sender-Auswahl')
       }
 
+      // Use senderId from response for consistency
+      const responseSenderId = String(data.senderId || data.stream_id || senderId)
+      console.log('[Select] Using senderId for polling:', responseSenderId)
+
       setSenders([])
       setStatus({
-        senderId: data.senderId,
+        senderId: responseSenderId,
         status: 'checking',
-        message: `Der Sender wird geprüft...`,
+        message: data.message || `Der Sender wird geprüft...`,
         timestamp: new Date().toISOString(),
       })
 
-      // Start polling for updates
-      startPolling(senderId)
+      // Start polling with the senderId from the response
+      startPolling(responseSenderId)
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten'
@@ -99,18 +103,25 @@ export default function DashboardPage() {
   }
 
   const startPolling = (senderId: string) => {
+    console.log(`[Polling] Started polling for sender ${senderId}`)
+    
     // Poll for status updates every 2 seconds
     const pollInterval = setInterval(async () => {
       try {
+        console.log(`[Polling] Checking status for sender ${senderId}`)
         const response = await fetch(`/api/n8n/status/${senderId}`)
+        
         if (!response.ok) {
+          console.log(`[Polling] Status not found yet (${response.status})`)
           // Status not found yet, keep polling
           return
         }
 
         const data = await response.json()
+        console.log(`[Polling] Received status:`, data)
         
         if (data.status === 'completed' || data.status === 'error') {
+          console.log(`[Polling] Final status received, stopping poll`)
           clearInterval(pollInterval)
           setStatus({
             senderId,
@@ -119,6 +130,8 @@ export default function DashboardPage() {
             timestamp: new Date().toISOString(),
             details: data.details || {},
           })
+        } else {
+          console.log(`[Polling] Status is ${data.status}, continuing to poll`)
         }
       } catch (error) {
         console.error('Polling error:', error)
@@ -127,6 +140,7 @@ export default function DashboardPage() {
 
     // Cleanup after 60 seconds
     setTimeout(() => {
+      console.log(`[Polling] Timeout reached, stopping poll`)
       clearInterval(pollInterval)
     }, 60000)
   }
