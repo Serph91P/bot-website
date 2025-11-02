@@ -40,3 +40,32 @@ public/sw.js
 public/workbox-*.js
 public/worker-*.js
 public/fallback-*.js
+
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+LICENSE
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Scripts
+*.sh
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# CI/CD
+.github/workflows
+
+# Logs
+*.log
