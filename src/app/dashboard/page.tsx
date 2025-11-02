@@ -70,7 +70,7 @@ export default function DashboardPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ senderId }),
+        body: JSON.stringify({ senderId: String(senderId) }),
       })
 
       const data = await response.json()
