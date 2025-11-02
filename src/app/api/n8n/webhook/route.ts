@@ -7,9 +7,15 @@ import { statusStore } from '@/lib/status-store'
  */
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    let body = await req.json()
 
     console.log('Received n8n callback:', body)
+
+    // n8n sendet manchmal ein Array, manchmal ein einzelnes Objekt
+    if (Array.isArray(body) && body.length > 0) {
+      body = body[0]
+      console.log('Extracted first item from array:', body)
+    }
 
     // Store the status update in memory
     // Support both stream_id and senderId for backwards compatibility
@@ -23,6 +29,7 @@ export async function POST(req: NextRequest) {
           details = JSON.parse(details)
         } catch (e) {
           console.error('Failed to parse details JSON:', e)
+          details = {}
         }
       }
 
@@ -33,7 +40,9 @@ export async function POST(req: NextRequest) {
       }
 
       statusStore.set(senderId, statusData)
-      console.log(`[Webhook] Stored status for sender ${senderId}`)
+      console.log(`[Webhook] Stored status for sender ${senderId}:`, statusData.status)
+    } else {
+      console.warn('[Webhook] No senderId found in callback:', body)
     }
 
     return NextResponse.json({ success: true })
